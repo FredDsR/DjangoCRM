@@ -81,3 +81,21 @@ def add_record(request):
     
     messages.error(request, 'Access denied.')
     redirect('home')
+
+def update_record(request, pk):
+    if request.user.is_authenticated:
+
+        record = Record.objects.get(id=pk)
+        
+        form = AddRecordForm(request.POST or None, instance=record)
+        
+        
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Record updated successfully!')
+            return render(request, 'record.html', {'record': record})
+
+        return render(request, 'update_record.html', {'form': form})
+    
+    messages.error(request, 'Access denied.')
+    redirect('home')
