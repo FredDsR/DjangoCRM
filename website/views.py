@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
 from .forms import SignUpForm
+from .models import Record
 
 def home(request):
 
@@ -21,9 +22,9 @@ def home(request):
         else:
             messages.error(request, "There was an error loggin in. Please, try again.")
             return redirect('home')
-
     else:
-        return render(request, 'home.html', {})
+        records = Record.objects.all()
+        return render(request, 'home.html', {'records': records})
 
 def logout_user(request):
     logout(request)
@@ -49,3 +50,22 @@ def register_user(request):
         form = SignUpForm()
     
     return render(request, 'register.html', {'form': form})
+
+def customer_record(request, pk):
+    if request.user.is_authenticated:
+        record = Record.objects.get(id=pk)
+        return render(request, 'record.html', {'record': record})
+    
+    messages.error(request, 'Access denied.')
+    return redirect('home')
+
+def delete_record(request, pk):
+    if request.user.is_authenticated:
+        delete_it = Record.objects.get(id=pk)
+        delete_it.delete()
+        messages.success(request, 'Record deleted successfully!')
+    else:
+        messages.error(request, 'Access denied.')
+
+    return redirect('home')
+
