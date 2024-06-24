@@ -95,7 +95,7 @@ def update_record(request, pk):
             messages.success(request, 'Record updated successfully!')
             return render(request, 'record.html', {'record': record})
 
-        return render(request, 'update_record.html', {'form': form})
+        return render(request, 'update_record.html', {'form': form, 'record': record})
     
     messages.error(request, 'Access denied.')
     redirect('home')
