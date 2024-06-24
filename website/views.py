@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
-from .forms import SignUpForm
+from .forms import SignUpForm, AddRecordForm
 from .models import Record
 
 def home(request):
@@ -64,8 +64,20 @@ def delete_record(request, pk):
         delete_it = Record.objects.get(id=pk)
         delete_it.delete()
         messages.success(request, 'Record deleted successfully!')
-    else:
-        messages.error(request, 'Access denied.')
-
+    
+    messages.error(request, 'Access denied.')
     return redirect('home')
 
+def add_record(request):
+    if request.user.is_authenticated:
+        form = AddRecordForm(request.POST or None)
+        if request.method == 'POST':
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Record added successfully!')
+                return redirect('home')
+
+        return render(request, 'add_record.html', {'form': form})
+    
+    messages.error(request, 'Access denied.')
+    redirect('home')
